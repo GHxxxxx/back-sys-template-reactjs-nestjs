@@ -58,16 +58,8 @@ const data = {
       isActive: true,
       items: [
         {
-          title: "History",
-          url: "#",
-        },
-        {
-          title: "Starred",
-          url: "#",
-        },
-        {
-          title: "Settings",
-          url: "#",
+          title: "挂号管理",
+          url: "qutpatient",
         },
       ],
     },

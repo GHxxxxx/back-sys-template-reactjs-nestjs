@@ -7,9 +7,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './auth/jwt-auth.grard';
 import { ConfigModule } from '@nestjs/config';
+import { AppointmentModule } from './management/qutpatient/appointment.module'; //门诊管理模块
 
 @Module({
-  imports: [AuthModule, TypeOrmModule.forRoot({
+  imports: [AuthModule, AppointmentModule, TypeOrmModule.forRoot({
     type: 'mysql', // 数据库类型
     host: '127.0.0.1',
     port: 3306,

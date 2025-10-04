@@ -25,3 +25,10 @@ pnpm -r dev
 ```
 pnpm add axios -F frontend
 ```
+
+
+
+## nestjs 
+```
+dto 定义数据类型
+```
