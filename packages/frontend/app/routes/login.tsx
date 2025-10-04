@@ -1,13 +1,33 @@
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { login } from "../../api/auth"
-
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import { Label } from "../components/ui/label";
+import { login } from "../../api/auth";
+import { toast } from "sonner"
+import { useNavigate } from "react-router";
 export default function Login() {
+  const navigate = useNavigate();
+  const handleSubmit =  ( event: React.FormEvent) => {
+    event.preventDefault();
 
-  const handleSubmit =  ( username:string, password:string) => {
+    // 获取表单数据
+    const formData = new FormData(event.target as HTMLFormElement);
+    const username = formData.get('email') as string;
+    const password = formData.get('password') as string;
+    
     login(username, password).then((res) => {
-      console.log(res) 
+      if (res.data.code === 200) {
+         toast.success('登录成功');
+        if (typeof window !== 'undefined' && res.data.data?.access_token) {
+          // 存储token
+          localStorage.setItem('access_token', res.data.data?.access_token);
+          // 存储用户信息
+          localStorage.setItem('user_info', JSON.stringify(res.data.data));
+          // 跳转到首页
+          navigate('/');
+        }
+      }else{
+        toast.error('登录失败');
+      } 
     })
   }
 
@@ -21,7 +41,7 @@ export default function Login() {
             请输入您的账号和密码
           </p>
         </div>
-        <form className="mt-8 space-y-6">
+        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-4">
             <div>
               <Label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -56,7 +76,6 @@ export default function Login() {
 
           <div>
             <Button
-              onClick={() => handleSubmit("admin", "123456")}
               type="submit"
               className="
               hover:cursor-pointer
