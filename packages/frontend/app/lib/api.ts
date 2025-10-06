@@ -135,3 +135,32 @@ export type Appointment = {
   createdAt: string;
   updatedAt: string;
 };
+
+
+export const hospitalisedApi = {
+  // 创建住院记录
+  create: (data: any) => request.post('/hospitalised', data),
+  
+  // 分页查询住院记录
+  findAll: (params: { page?: number; pageSize?: number; doctorName?: string , patientName?:string }) => 
+    request.get('/hospitalised', { params }),
+  
+  // 获取单个住院记录
+  findOne: (id: number) => request.get(`/hospitalised/${id}`),
+  
+  // 更新住院记录
+  update: (id: number, data: any) => request.patch(`/hospitalised/${id}`, data),
+  
+  // 删除住院记录
+  remove: (id: number) => request.delete(`/hospitalised/${id}`),
+  
+  // 办理出院
+  discharge: (data: any) => request.post('/hospitalised/discharge', data),
+  
+  // 查询床位
+  findBeds: (params: any) => request.get('/hospitalised/beds', { params }),
+  
+  // 更新床位状态
+  updateBedStatus: (id: number, status: string) => 
+    request.patch(`/hospitalised/beds/${id}/status`, { status }),
+};

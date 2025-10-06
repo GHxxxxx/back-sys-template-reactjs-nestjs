@@ -23,8 +23,6 @@ export class JwtAuthStrategy extends PassportStrategy(Strategy, "jwt") {
             ignoreExpiration: false,  // 不忽略过期检查
             secretOrKey: jwtConstants.secret,  // 使用配置的密钥验证token
         })
-
-        console.log("jwt验证策略已启动")
     }
 
     // token验证方法

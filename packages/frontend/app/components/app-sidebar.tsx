@@ -53,7 +53,7 @@ const data = {
   navMain: [
     {
       title: "门诊管理",
-      url: "#",
+      url: "",
       icon: SquareTerminal,
       isActive: true,
       items: [
@@ -65,20 +65,12 @@ const data = {
     },
     {
       title: "住院管理",
-      url: "#",
+      url: "",
       icon: Bot,
       items: [
         {
-          title: "Genesis",
-          url: "#",
-        },
-        {
-          title: "Explorer",
-          url: "#",
-        },
-        {
-          title: "Quantum",
-          url: "#",
+          title: "住院管理",
+          url: "hospitalised",
         },
       ],
     },

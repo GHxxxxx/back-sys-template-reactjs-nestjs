@@ -3,10 +3,10 @@
 import * as React from "react"
 import { format } from "date-fns"
 import { zhCN } from "date-fns/locale"
-import { 
-  CalendarIcon, 
-  PlusIcon, 
-  SearchIcon, 
+import {
+  CalendarIcon,
+  PlusIcon,
+  SearchIcon,
   UserIcon,
   ClockIcon,
   CheckCircleIcon,
@@ -16,13 +16,13 @@ import {
 
 import { Button } from "~/components/ui/button"
 import { Input } from "~/components/ui/input"
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
 } from "~/components/ui/table"
 import {
   DropdownMenu,
@@ -40,20 +40,20 @@ import {
   CardTitle,
 } from "~/components/ui/card"
 import { Badge } from "~/components/ui/badge"
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
 } from "~/components/ui/select"
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogDescription, 
-  DialogHeader, 
-  DialogTitle, 
-  DialogTrigger 
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger
 } from "~/components/ui/dialog"
 import { Label } from "~/components/ui/label"
 import { Textarea } from "~/components/ui/textarea"
@@ -68,7 +68,7 @@ import {
   PaginationPrevious,
 } from "../../components/ui/pagination"
 import { appointmentApi, type Appointment } from "../../lib/api"
-import { useNavigate } from "react-router";
+import { statusMap, triageStatusMap, visitStatusMap } from "./data"
 
 export function AppointmentList() {
   const [appointments, setAppointments] = React.useState<Appointment[]>([])
@@ -79,7 +79,6 @@ export function AppointmentList() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = React.useState(false)
   const [isActionDialogOpen, setIsActionDialogOpen] = React.useState(false)
   const [selectedAppointment, setSelectedAppointment] = React.useState<Appointment | null>(null)
-  const navigate = useNavigate();
   // 分页状态
   const [pagination, setPagination] = React.useState({
     page: 1,
@@ -87,7 +86,7 @@ export function AppointmentList() {
     total: 0,
     totalPages: 0
   })
-  
+
   // 表单数据
   const [formData, setFormData] = React.useState({
     patientName: "",
@@ -103,14 +102,14 @@ export function AppointmentList() {
         page: pagination.page,
         pageSize: pagination.pageSize
       }
-      
+
       if (searchTerm) params.search = searchTerm
       if (statusFilter !== "all") params.status = statusFilter
       if (triageFilter !== "all") params.triageStatus = triageFilter
       if (visitFilter !== "all") params.visitStatus = visitFilter
-      
+
       const result = await appointmentApi.getAppointments(params)
-      
+
       if (result.code === 200) {
         setAppointments(result.data)
         if (result.pagination) {
@@ -148,17 +147,17 @@ export function AppointmentList() {
         toast.error("患者姓名不能为空")
         return
       }
-      
+
       if (!formData.patientIdCard.trim()) {
         toast.error("身份证号不能为空")
         return
       }
-      
+
       if (!formData.phone.trim()) {
         toast.error("联系电话不能为空")
         return
       }
-      
+
       const newAppointment = {
         patientName: formData.patientName,
         patientIdCard: formData.patientIdCard,
@@ -180,7 +179,7 @@ export function AppointmentList() {
       }
 
       const result = await appointmentApi.createAppointment(newAppointment)
-      
+
       if (result.code === 200) {
         toast.success("挂号创建成功")
         setIsCreateDialogOpen(false)
@@ -206,7 +205,7 @@ export function AppointmentList() {
   const handleConfirmAppointment = async (id: number) => {
     try {
       const result = await appointmentApi.confirmAppointment(id)
-      
+
       if (result.code === 200) {
         toast.success("挂号已确认")
         fetchAppointments()
@@ -223,7 +222,7 @@ export function AppointmentList() {
   const handleCancelAppointment = async (id: number) => {
     try {
       const result = await appointmentApi.cancelAppointment(id)
-      
+
       if (result.code === 200) {
         toast.success("挂号已取消")
         fetchAppointments()
@@ -240,7 +239,7 @@ export function AppointmentList() {
   const handleStartTriage = async (id: number) => {
     try {
       const result = await appointmentApi.startTriage(id)
-      
+
       if (result.code === 200) {
         toast.success("开始分诊")
         fetchAppointments()
@@ -256,14 +255,14 @@ export function AppointmentList() {
   // 处理完成分诊
   const handleCompleteTriage = async () => {
     if (!selectedAppointment) return
-    
+
     try {
       const result = await appointmentApi.completeTriage(selectedAppointment.id, {
         roomId: 3,
         priority: 2,
         triageNotes: "分诊完成"
       })
-      
+
       if (result.code === 200) {
         toast.success("分诊完成")
         setIsActionDialogOpen(false)
@@ -281,7 +280,7 @@ export function AppointmentList() {
   const handleSkipTriage = async (id: number) => {
     try {
       const result = await appointmentApi.skipTriage(id)
-      
+
       if (result.code === 200) {
         toast.success("已跳过分诊")
         fetchAppointments()
@@ -298,7 +297,7 @@ export function AppointmentList() {
   const handleStartVisit = async (id: number) => {
     try {
       const result = await appointmentApi.startVisit(id)
-      
+
       if (result.code === 200) {
         toast.success("开始就诊")
         fetchAppointments()
@@ -314,13 +313,13 @@ export function AppointmentList() {
   // 处理完成就诊
   const handleCompleteVisit = async () => {
     if (!selectedAppointment) return
-    
+
     try {
       const result = await appointmentApi.completeVisit(selectedAppointment.id, {
         diagnosis: "感冒",
         prescription: "阿莫西林胶囊 3次/日 5天"
       })
-      
+
       if (result.code === 200) {
         toast.success("就诊完成")
         setIsActionDialogOpen(false)
@@ -338,7 +337,7 @@ export function AppointmentList() {
   const handleMissVisit = async (id: number) => {
     try {
       const result = await appointmentApi.missVisit(id)
-      
+
       if (result.code === 200) {
         toast.success("标记为错过就诊")
         fetchAppointments()
@@ -351,26 +350,6 @@ export function AppointmentList() {
     }
   }
 
-  // 状态映射
-  const statusMap = {
-    pending: { label: "待确认", color: "bg-yellow-100 text-yellow-800" },
-    confirmed: { label: "已确认", color: "bg-green-100 text-green-800" },
-    cancelled: { label: "已取消", color: "bg-red-100 text-red-800" }
-  }
-
-  const triageStatusMap = {
-    pending: { label: "待分诊", color: "bg-yellow-100 text-yellow-800" },
-    in_progress: { label: "分诊中", color: "bg-blue-100 text-blue-800" },
-    completed: { label: "分诊完成", color: "bg-green-100 text-green-800" },
-    skipped: { label: "跳过分诊", color: "bg-gray-100 text-gray-800" }
-  }
-
-  const visitStatusMap = {
-    pending: { label: "待就诊", color: "bg-yellow-100 text-yellow-800" },
-    in_progress: { label: "就诊中", color: "bg-blue-100 text-blue-800" },
-    completed: { label: "就诊完成", color: "bg-green-100 text-green-800" },
-    missed: { label: "错过就诊", color: "bg-red-100 text-red-800" }
-  }
 
   return (
     <div className="space-y-4">
@@ -382,7 +361,7 @@ export function AppointmentList() {
           </p>
         </div>
         <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-          <DialogTrigger asChild>
+          <DialogTrigger asChild className="hover:cursor-pointer">
             <Button>
               <PlusIcon className="mr-2 h-4 w-4" />
               新建挂号
@@ -400,44 +379,44 @@ export function AppointmentList() {
                 <Label htmlFor="patientName" className="text-right">
                   患者姓名
                 </Label>
-                <Input 
-                  id="patientName" 
-                  className="col-span-3" 
+                <Input
+                  id="patientName"
+                  className="col-span-3"
                   value={formData.patientName}
-                  onChange={(e) => setFormData(prev => ({...prev, patientName: e.target.value}))}
+                  onChange={(e) => setFormData(prev => ({ ...prev, patientName: e.target.value }))}
                 />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="idCard" className="text-right">
                   身份证号
                 </Label>
-                <Input 
-                  id="idCard" 
-                  className="col-span-3" 
+                <Input
+                  id="idCard"
+                  className="col-span-3"
                   value={formData.patientIdCard}
-                  onChange={(e) => setFormData(prev => ({...prev, patientIdCard: e.target.value}))}
+                  onChange={(e) => setFormData(prev => ({ ...prev, patientIdCard: e.target.value }))}
                 />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="phone" className="text-right">
                   联系电话
                 </Label>
-                <Input 
-                  id="phone" 
-                  className="col-span-3" 
+                <Input
+                  id="phone"
+                  className="col-span-3"
                   value={formData.phone}
-                  onChange={(e) => setFormData(prev => ({...prev, phone: e.target.value}))}
+                  onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
                 />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="description" className="text-right">
                   病情描述
                 </Label>
-                <Textarea 
-                  id="description" 
-                  className="col-span-3" 
+                <Textarea
+                  id="description"
+                  className="col-span-3"
                   value={formData.description}
-                  onChange={(e) => setFormData(prev => ({...prev, description: e.target.value}))}
+                  onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
                 />
               </div>
             </div>
@@ -511,7 +490,8 @@ export function AppointmentList() {
           <Table className="mt-4">
             <TableHeader>
               <TableRow>
-                <TableHead>患者信息</TableHead>
+                <TableHead>患者姓名</TableHead>
+                <TableHead>身份证号</TableHead>
                 <TableHead>预约时间</TableHead>
                 <TableHead>挂号状态</TableHead>
                 <TableHead>分诊状态</TableHead>
@@ -524,9 +504,9 @@ export function AppointmentList() {
                 <TableRow key={appointment.id} >
                   <TableCell>
                     <div className="font-medium">{appointment.patientName}</div>
-                    <div className="text-sm text-muted-foreground">
-                      {appointment.patientIdCard}
-                    </div>
+                  </TableCell>
+                  <TableCell>
+                    {appointment.patientIdCard}
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center">
@@ -589,7 +569,7 @@ export function AppointmentList() {
                           </DropdownMenuItem>
                         )}
                         {appointment.status === "confirmed" && appointment.triageStatus === "in_progress" && (
-                          <DropdownMenuItem 
+                          <DropdownMenuItem
                             onClick={() => {
                               setSelectedAppointment(appointment)
                               setIsActionDialogOpen(true)
@@ -599,7 +579,7 @@ export function AppointmentList() {
                           </DropdownMenuItem>
                         )}
                         {appointment.status === "confirmed" && appointment.visitStatus === "in_progress" && (
-                          <DropdownMenuItem 
+                          <DropdownMenuItem
                             onClick={() => {
                               setSelectedAppointment(appointment)
                               setIsActionDialogOpen(true)
@@ -629,12 +609,12 @@ export function AppointmentList() {
             <Pagination>
               <PaginationContent>
                 <PaginationItem>
-                  <PaginationPrevious 
+                  <PaginationPrevious
                     onClick={() => handlePageChange(Math.max(1, pagination.page - 1))}
-                    className={pagination.page === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                    className={pagination.total === 0 || Number(pagination.page) === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
                   />
                 </PaginationItem>
-                
+
                 {Array.from({ length: Math.min(5, pagination.totalPages) }, (_, i) => {
                   let pageNum;
                   if (pagination.totalPages <= 5) {
@@ -646,12 +626,12 @@ export function AppointmentList() {
                   } else {
                     pageNum = pagination.page - 2 + i;
                   }
-                  
+
                   return (
                     <PaginationItem key={pageNum}>
                       <PaginationLink
                         onClick={() => handlePageChange(pageNum)}
-                        isActive={pageNum === pagination.page}
+                        isActive={ Number(pageNum) === Number(pagination.page) } 
                         className="cursor-pointer"
                       >
                         {pageNum}
@@ -659,17 +639,17 @@ export function AppointmentList() {
                     </PaginationItem>
                   );
                 })}
-                
+
                 {pagination.totalPages > 5 && pagination.page < pagination.totalPages - 2 && (
                   <PaginationItem>
                     <PaginationEllipsis />
                   </PaginationItem>
                 )}
-                
+
                 <PaginationItem>
-                  <PaginationNext 
-                    onClick={() => handlePageChange(Math.min(pagination.totalPages, pagination.page + 1))}
-                    className={pagination.page === pagination.totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                  <PaginationNext
+                    onClick={() => handlePageChange(Math.min(Number(pagination.totalPages), Number(pagination.page) + 1))}
+                    className={pagination.total === 0 || Number(pagination.page) === Number(pagination.totalPages) ? "pointer-events-none opacity-50" : "cursor-pointer"}
                   />
                 </PaginationItem>
               </PaginationContent>

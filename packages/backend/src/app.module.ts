@@ -1,4 +1,4 @@
-import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
+import { Module, NestModule, MiddlewareConsumer, Controller } from '@nestjs/common';
 import * as cors from 'cors';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -8,15 +8,15 @@ import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './auth/jwt-auth.grard';
 import { ConfigModule } from '@nestjs/config';
 import { AppointmentModule } from './management/qutpatient/appointment.module'; //门诊管理模块
-
+import { HospitalisedModule } from './management/hospitalised/hospitalised.module'; //住院管理模块
 @Module({
-  imports: [AuthModule, AppointmentModule, TypeOrmModule.forRoot({
+  imports: [AuthModule, AppointmentModule,HospitalisedModule,TypeOrmModule.forRoot({
     type: 'mysql', // 数据库类型
     host: '127.0.0.1',
     port: 3306,
     username: 'root',
     password: '123456',
-    database: 'web',
+    database: 'boluo',
     synchronize: true,
     retryDelay: 500, //重试连接数据库间隔
     retryAttempts: 10,//重试连接数据库的次数
@@ -26,10 +26,7 @@ import { AppointmentModule } from './management/qutpatient/appointment.module'; 
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-
-
   ],
-  controllers: [AppController],
   // 注册为全局守卫
   providers: [AppService, {
     provide: APP_GUARD,

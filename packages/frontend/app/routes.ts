@@ -4,6 +4,7 @@ export default [
     route("/", "routes/home.tsx", [
         index("routes/home.index.tsx"),
         route("qutpatient", "routes/qutpatient/page.tsx"),
+        route("hospitalised", "routes/hospitalised/page.tsx"),
     ]),
     route("login", "routes/login.tsx"),
 ] satisfies RouteConfig;
